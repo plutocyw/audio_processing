@@ -262,8 +262,81 @@ Handles automatically:
 
 ---
 
-## Claude Code Skill Integration
+## Claude Code Skill
 
-These scripts are designed to be used as the backend for a Claude Code skill. A skill wraps this workflow in a conversational interface — you describe what you want in plain language and Claude drives the scripts for you.
+This repo ships with a `/podcast` slash command for [Claude Code](https://claude.ai/code). Clone the repo, open it in Claude Code, and type `/podcast` to get a fully guided interactive workflow.
 
-To use as a skill, place these scripts in your skill's directory and invoke them via `subprocess` or shell calls from your skill definition. The scripts are self-contained and require no pip dependencies.
+### Setup
+
+```bash
+git clone https://github.com/plutocyw/audio_processing.git
+cd audio_processing
+```
+
+Open the folder in Claude Code (CLI or IDE extension), then:
+
+```
+/podcast
+```
+
+### What the skill does
+
+The `/podcast` command walks you through every step conversationally:
+
+1. **Prerequisites check** — verifies ffmpeg and `OPENAI_API_KEY` are ready, tells you exactly what to fix if not
+2. **Episode browsing** — paste any RSS URL, or pick from your saved podcast library
+3. **Transcription** — shows cost estimate before starting, then runs download + compress + transcribe automatically
+4. **Output choice** — choose one:
+   - **Digest** — key topics, notable quotes, main takeaways as a formatted article
+   - **Proofread** — cleaned-up transcript with speaker labels and paragraph breaks
+   - **Raw** — the Whisper transcript as-is
+5. **Email delivery** (optional) — sends the result via [himalaya](https://github.com/soywod/himalaya)
+
+### Example session
+
+```
+> /podcast
+
+Checking prerequisites... ffmpeg ✓  OPENAI_API_KEY ✓
+
+Your library:
+  1  Lex Fridman Podcast   lex-fridman-podcast
+  2  99% Invisible         99-invisible
+
+Pick a podcast (or paste a new RSS URL):
+> 1
+
+Fetching feed: Lex Fridman Podcast
+  1 | May 28, 2026 | 2h 14m | #432 — The Future of AI
+  2 | May 21, 2026 | 1h 47m | #431 — Climate and Technology
+  ...
+
+Which episode?
+> 1
+
+Transcribe "#432 — The Future of AI"?
+Estimated cost: ~$0.80  |  Estimated time: ~5 min
+Proceed? (yes / no)
+> yes
+
+[Downloading... Compressing... Transcribing chunks 1/3, 2/3, 3/3... Done]
+Transcript saved: ~/podcasts/lex-fridman-podcast/2026-05-28-432.../transcript.txt
+
+What would you like to do with it?
+  1. Generate a digest
+  2. Proofread and clean up
+  3. Show raw transcript
+  4. Nothing — I'll read the file directly
+> 1
+
+[Digest output...]
+
+Would you like to send this by email?
+> yes
+
+Send to: you@example.com
+Subject: Digest: #432 — The Future of AI
+Confirm? > yes
+
+Sent.
+```
