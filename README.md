@@ -59,18 +59,25 @@ export OPENAI_API_KEY="sk-..."
 
 ---
 
-### Step 1 — Find the RSS feed URL
+### Step 1 — Find a podcast
 
-You need the podcast's **RSS feed URL** (not its website URL).
+Search by name — no need to hunt for the RSS URL yourself:
 
-**How to find it:**
-- Most podcast apps: right-click the show → "Copy RSS" or "Share Feed"
-- Search `<podcast name> RSS feed` — the URL usually ends in `/feed`, `/rss`, or `.xml`
-- Apple Podcasts: right-click the show → Copy Link → paste into [getrssfeed.com](https://getrssfeed.com)
+```bash
+python3 manage.py search "lex fridman"
+```
 
-Examples:
-- Lex Fridman: `https://lexfridman.com/feed/podcast/`
-- 99% Invisible: `https://feeds.simplecast.com/BqbsxVfO`
+```
+#    Podcast                                       Episodes  Feed URL
+──────────────────────────────────────────────────────────────────────────────────────────
+1    Lex Fridman Podcast                                432  https://lexfridman.com/feed/podcast/
+2    Lex Fridman Podcast (Video)                        432  https://lexfridman.com/feed/video/
+...
+```
+
+Uses the iTunes Search API — no account or API key required.
+
+If you already know the RSS URL, you can skip search and go straight to `add`.
 
 ---
 
@@ -189,6 +196,7 @@ python3 manage.py show lex-fridman-podcast 1 \
 ### All manage.py commands
 
 ```
+python3 manage.py search <name>           Search for a podcast by name (iTunes)
 python3 manage.py add <rss_url>           Add a podcast to your library
 python3 manage.py list                    List all subscribed podcasts
 python3 manage.py episodes <podcast>      Show latest 10 episodes with status

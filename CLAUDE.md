@@ -20,6 +20,7 @@ Podcast download, management, and transcription toolkit using OpenAI Whisper. Ze
 ## manage.py commands
 
 ```bash
+python3 manage.py search <name>           # search iTunes by podcast name → returns feed URL
 python3 manage.py add <rss_url>           # subscribe to a podcast
 python3 manage.py list                    # list subscribed podcasts
 python3 manage.py episodes <podcast>      # show latest 10 episodes with status

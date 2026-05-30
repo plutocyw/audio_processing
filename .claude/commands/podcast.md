@@ -44,17 +44,31 @@ Do not continue if either check fails.
 Check if the user provided an RSS URL or podcast name in $ARGUMENTS.
 
 **If $ARGUMENTS contains an RSS URL** (starts with `http`):
-- Skip to Step 3 and use that URL directly without adding to the library
+- Skip to Step 3 and use that URL directly without adding to the library.
 
-**If $ARGUMENTS is a podcast name or empty**:
+**If $ARGUMENTS is a podcast name or keyword**:
+- Search iTunes immediately:
+```bash
+python3 manage.py search "<the name or keyword from $ARGUMENTS>"
+```
+- Show the results and ask the user to pick one, then run `python3 manage.py add <feed_url>` before continuing to Step 3.
+
+**If $ARGUMENTS is empty**:
 - Show the library:
 ```bash
 python3 manage.py list
 ```
+- If the library has entries, ask the user to pick one by number, or offer to search for a new podcast.
 - If the library is empty, ask:
-  > No podcasts in your library yet. Paste an RSS feed URL to get started.
-  Then wait for input and proceed with that URL.
-- If the library has entries, ask the user to pick one by number, or offer to add a new feed.
+  > No podcasts in your library yet. Search by name or paste an RSS URL.
+
+  Wait for the user's response:
+  - If it looks like an RSS URL (starts with `http`) → proceed with it directly
+  - Otherwise → treat it as a search query:
+    ```bash
+    python3 manage.py search "<user input>"
+    ```
+    Show results, let the user pick one, then `python3 manage.py add <feed_url>`.
 
 ---
 

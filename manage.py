@@ -3,6 +3,7 @@
 manage.py — podcast library manager
 
 Commands:
+    search <name>               Search for a podcast by name (iTunes)
     add <rss_url>               Add a podcast feed to your library
     list                        List subscribed podcasts
     episodes <podcast>          Show latest episodes with download/transcript status
@@ -27,6 +28,7 @@ import os
 import json
 import subprocess
 import urllib.request
+import urllib.parse
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from datetime import date
@@ -109,6 +111,40 @@ def episode_status(podcast, ep):
 
 
 # ── Commands ──────────────────────────────────────────────────────────────────
+
+def cmd_search(args):
+    if not args:
+        die("Usage: manage.py search <podcast name>")
+
+    query = " ".join(args)
+    encoded = urllib.parse.quote(query)
+    url = f"https://itunes.apple.com/search?term={encoded}&media=podcast&entity=podcast&limit=10"
+
+    print(f"Searching: {query}")
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        die(f"Search failed: {e}")
+
+    results = [r for r in data.get("results", []) if r.get("feedUrl")]
+    if not results:
+        print(f"No results found for: {query!r}")
+        return
+
+    print(f"\n{'#':<4} {'Podcast':<45} {'Episodes':>9}  Feed URL")
+    print("─" * 90)
+    for i, r in enumerate(results, 1):
+        name = r.get("collectionName", "")
+        if len(name) > 43:
+            name = name[:42] + "…"
+        count = str(r.get("trackCount", "?"))
+        feed = r["feedUrl"]
+        print(f"{i:<4} {name:<45} {count:>9}  {feed}")
+
+    print(f"\nTo add one:\n  python3 manage.py add <feed_url>")
+
 
 def cmd_add(args):
     if not args:
@@ -289,6 +325,7 @@ def cmd_show(args):
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 COMMANDS = {
+    "search": cmd_search,
     "add": cmd_add,
     "list": cmd_list,
     "episodes": cmd_episodes,
@@ -301,6 +338,7 @@ USAGE = """\
 Usage: python3 manage.py <command> [args]
 
 Commands:
+  search <name>               Search for a podcast by name (iTunes)
   add <rss_url>               Add a podcast to your library
   list                        List subscribed podcasts
   episodes <podcast>          Show latest episodes with download/transcript status
